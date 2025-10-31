@@ -1,1 +1,30 @@
-AI,ML
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+data = {
+    'Resume': [
+        "Experienced Python developer skilled in machine learning, data science, and AI.",
+        "Software engineer with strong Java, Spring Boot, and backend experience.",
+        "Data analyst proficient in Excel, SQL, and Power BI for business insights."
+    ],
+    'Candidate': ['Madhuri', 'Pragna', 'Greeshma']
+}
+
+df = pd.DataFrame(data)
+
+job_description = """We are looking for a Python and Machine Learning developer 
+who can work on AI and Data Science projects."""
+
+corpus = [job_description] + df['Resume'].tolist()
+
+tfidf = TfidfVectorizer(stop_words='english')
+vectors = tfidf.fit_transform(corpus)
+
+similarity = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
+
+df['Match_Score (%)'] = (similarity * 100).round(2)
+
+df_sorted = df.sort_values(by='Match_Score (%)', ascending=False)
+print("Job Description:\n", job_description)
+print("\nResume Match Results:\n", df_sorted[['Candidate', 'Match_Score (%)']])
